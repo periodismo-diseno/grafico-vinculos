@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Vínculos - Homicidios</title>
+    <!-- Importar Chart.js para el gráfico interactivo -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Optimización UI/UX */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: transparent; /* Ideal para incrustar en sitios web */
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+        .chart-container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        .source-footer {
+            margin-top: 20px;
+            font-size: 0.85em;
+            color: #7f8c8d;
+            text-align: right;
+            font-style: italic;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 10px;
+        }
+        /* Contenedor del canvas para mantener proporciones */
+        .canvas-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chart-container">
+    <h2>Cantidad de Víctimas según Tipo de Vínculo</h2>
+    
+    <div class="canvas-wrapper">
+        <canvas id="vinculosChart"></canvas>
+    </div>
+
+    <div class="source-footer">
+        Fuente: Informe de Víctimas de Homicidios Consumados en Chile 2025.
+    </div>
+</div>
+
+<script>
+    // Datos extraídos del archivo vinculos.json
+    const jsonData = [
+      {"Tipo de vínculo": "Conviviente", "Proporción": 0.543, "Cantidad": 25},
+      {"Tipo de vínculo": "Pareja sexual o sentimental", "Proporción": 0.152, "Cantidad": 7},
+      {"Tipo de vínculo": "Ex conviviente", "Proporción": 0.152, "Cantidad": 7},
+      {"Tipo de vínculo": "Expareja sexual o sentimental", "Proporción": 0.065, "Cantidad": 3},
+      {"Tipo de vínculo": "Conocido", "Proporción": 0.065, "Cantidad": 3},
+      {"Tipo de vínculo": "Desconocido", "Proporción": 0, "Cantidad": 0},
+      {"Tipo de vínculo": "Sin información", "Proporción": 0.022, "Cantidad": 1}
+    ];
+
+    // Procesar datos para el gráfico
+    const labels = jsonData.map(item => item["Tipo de vínculo"]);
+    const dataCantidad = jsonData.map(item => item["Cantidad"]);
+
+    // Configuración del gráfico interactivo
+    const ctx = document.getElementById('vinculosChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'line', // Tipo de gráfico: Líneas
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Número de Víctimas',
+                data: dataCantidad,
+                borderColor: '#8A2BE2', // Color Violeta para la línea
+                backgroundColor: 'rgba(255, 140, 0, 0.15)', // Color Anaranjado con opacidad para el área bajo la curva
+                pointBackgroundColor: '#FF8C00', // Color Anaranjado para los puntos
+                pointBorderColor: '#ffffff',
+                pointHoverBackgroundColor: '#ffffff',
+                pointHoverBorderColor: '#8A2BE2', // Hover Violeta
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                borderWidth: 3,
+                fill: true, // Activa el relleno inferior
+                tension: 0.3 // Suaviza la línea (curvas)
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        font: { size: 14, family: "'Segoe UI', Roboto, sans-serif" },
+                        color: '#34495e'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(138, 43, 226, 0.9)', // Tooltip con fondo Violeta oscuro
+                    titleFont: { size: 14, family: "'Segoe UI', Roboto, sans-serif" },
+                    bodyFont: { size: 14, family: "'Segoe UI', Roboto, sans-serif" },
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `Cantidad: ${context.parsed.y} víctimas`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Cantidad',
+                        color: '#7f8c8d'
+                    },
+                    grid: {
+                        color: '#f0f3f4',
+                        borderDash: [5, 5]
+                    },
+                    ticks: { color: '#7f8c8d' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#7f8c8d',
+                        maxRotation: 45, // Rota el texto para mejorar la lectura (UX)
+                        minRotation: 45
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
